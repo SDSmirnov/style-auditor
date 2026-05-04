@@ -1,2 +1,10 @@
+meta:
+  environment: docker
+
+build:
+  dockerfile: Dockerfile
+  args:
+    VITE_API_URL: https://ЗАМЕНИТЕ-НА-АДРЕС-БЕКЕНДА.amvera.io/api/analyze
+
 run:
   containerPort: 80

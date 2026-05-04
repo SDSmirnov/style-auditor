@@ -1,2 +1,8 @@
+meta:
+  environment: docker
+
+build:
+  dockerfile: Dockerfile
+
 run:
   containerPort: 8080
