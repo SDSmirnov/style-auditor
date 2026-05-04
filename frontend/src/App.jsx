@@ -54,6 +54,7 @@ export default function App() {
 
   return (
       <main className="page">
+        <img src="/logo.png" alt="логотип" className="siteLogo" />
         <h1>Аудит стиля (детектор графомании)</h1>
 
         <section className="inputPanel">
@@ -200,6 +201,7 @@ export default function App() {
               </section>
             </>
         )}
+        <footer className="siteFooter">Сайт не несёт ответственности ни за что.</footer>
       </main>
   );
 }
