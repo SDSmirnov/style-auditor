@@ -522,25 +522,6 @@ textarea {
   color: #374151;
 }
 
-.legend {
-  margin: 16px 0;
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  border-radius: 12px;
-  background: #ffffff;
-}
-
-.legend summary {
-  padding: 12px 16px;
-  cursor: pointer;
-  font-weight: 600;
-  color: #374151;
-  user-select: none;
-}
-
-.legend summary:hover {
-  color: #111827;
-}
-
 .legendBody {
   padding: 4px 16px 16px;
   display: flex;

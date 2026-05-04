@@ -202,7 +202,7 @@ export default function App() {
 
 function Legend() {
   return (
-    <details className="legend">
+    <details className="legendSpoiler">
       <summary>Легенда</summary>
       <div className="legendBody">
         <section className="legendSection">
