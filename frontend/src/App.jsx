@@ -148,6 +148,8 @@ export default function App() {
                           </div>
                         </header>
 
+                        <p className="chunkExplanation">{explainScore(chunk)}</p>
+
                         <div className="meters">
                           <Meter
                               label="Ожидаемость лексики"
@@ -211,6 +213,17 @@ function Legend() {
     <details className="legendSpoiler">
       <summary>Легенда</summary>
       <div className="legendBody">
+        <section className="legendSection">
+          <h4>Индекс чанка</h4>
+          <p className="legendText">
+            Число от 0 до 100. Складывается из штрафных баллов за каждый найденный паттерн —
+            чем серьёзнее паттерн, тем больше очков он даёт (от 5 до 15).
+            Метрики сглаженности (ритм, лексика) добавляют баллы сверху.
+            Несколько паттернов на одном участке перекрываются и окрашиваются красным — это тоже усиливает счёт.
+            Итоговый балл не суммируется по чанкам: каждый оценивается независимо.
+          </p>
+        </section>
+
         <section className="legendSection">
           <h4>Цвета подсветки</h4>
           <ul className="legendColors">
@@ -313,6 +326,25 @@ function renderHighlightedText(chunk) {
   }
 
   return parts;
+}
+
+function explainScore(chunk) {
+  if (chunk.riskScore === 0) return 'Паттернов не найдено — балл нулевой.';
+
+  const parts = [];
+
+  const high = chunk.flags?.filter(f => f.severity === 'high') || [];
+  const medium = chunk.flags?.filter(f => f.severity === 'medium') || [];
+  const low = chunk.flags?.filter(f => f.severity === 'low') || [];
+
+  if (high.length > 0) parts.push(`сильные паттерны: ${high.map(f => f.type).join(', ')}`);
+  if (medium.length > 0) parts.push(`умеренные паттерны: ${medium.map(f => f.type).join(', ')}`);
+  if (low.length > 0) parts.push(`слабые паттерны: ${low.map(f => f.type).join(', ')}`);
+  if (chunk.rhythmMonotony > 40) parts.push(`монотонный ритм (${chunk.rhythmMonotony}/100)`);
+  if (chunk.lexicalPredictability > 40) parts.push(`предсказуемая лексика (${chunk.lexicalPredictability}/100)`);
+
+  if (parts.length === 0) return 'Незначительные отклонения по метрикам.';
+  return `Из чего складывается балл: ${parts.join('; ')}.`;
 }
 
 function riskClass(score) {
