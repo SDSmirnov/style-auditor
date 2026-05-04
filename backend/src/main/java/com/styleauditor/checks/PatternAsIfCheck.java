@@ -25,7 +25,7 @@ public class PatternAsIfCheck extends RegexCheck {
 
     @Override
     protected String comment() {
-        return "Пункт 8: сравнения через «будто/словно». В хорроре нормальны, но частый повтор заметен.";
+        return "Пункт 8: сравнения через «будто/словно».";
     }
 
     @Override
