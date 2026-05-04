@@ -9,7 +9,7 @@ RUN npm install --include=optional
 
 COPY . .
 
-ARG VITE_API_URL=https://amvera-olegkolokolnikov-run-auditor-b.amvera.io/api/analyze
+ARG VITE_API_URL=https://auditor-b-olegkolokolnikov.amvera.io/api/analyze
 ENV VITE_API_URL=$VITE_API_URL
 
 RUN rm -rf node_modules package-lock.json \
