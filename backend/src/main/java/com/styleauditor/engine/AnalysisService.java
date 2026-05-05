@@ -139,7 +139,7 @@ public class AnalysisService {
         }
 
         double rhythm = rhythmMonotony(lengths, std);
-        double finalScore = Math.min(100, score);
+        double finalScore = Math.min(100, Math.max(0, score));
 
         return new ChunkResult(
                 index,
