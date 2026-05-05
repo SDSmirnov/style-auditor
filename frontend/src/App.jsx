@@ -59,8 +59,10 @@ export default function App() {
 
   return (
       <main className="page">
-        <img src="/logo.png" alt="логотип" className="siteLogo" />
-        <h1>Аудит стиля (детектор графомании)</h1>
+        <h1>
+          <img src="/logo.png" alt="логотип" className="siteLogo" />
+          Аудит стиля (детектор графомании)
+        </h1>
 
         <section className="inputPanel">
           <div className="toolbar">
