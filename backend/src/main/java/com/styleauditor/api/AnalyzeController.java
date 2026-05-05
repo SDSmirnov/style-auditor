@@ -20,7 +20,7 @@ public class AnalyzeController {
         this.service = service;
     }
 
-    private static final int MAX_CHARS = 150_000;
+    private static final int MAX_CHARS = 200_000;
 
     @PostMapping("/analyze")
     public ResponseEntity<?> analyze(@RequestBody(required = false) AnalyzeRequest request) {

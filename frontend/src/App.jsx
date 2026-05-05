@@ -48,7 +48,7 @@ export default function App() {
     setActiveChunk(null);
   }
 
-  const MAX_CHARS = 150_000;
+  const MAX_CHARS = 200_000;
   const charCount = text.length;
   const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
   const shownChunks = result
@@ -88,7 +88,7 @@ export default function App() {
               <span className="wordCount">{wordCount} / 50 слов</span>
             )}
             {charCount > MAX_CHARS && (
-              <span className="wordCount error">{charCount.toLocaleString("ru")} / 150 000 симв.</span>
+              <span className="wordCount error">{charCount.toLocaleString("ru")} / 200 000 симв.</span>
             )}
           </div>
 
