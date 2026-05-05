@@ -20,10 +20,15 @@ public class AnalyzeController {
         this.service = service;
     }
 
+    private static final int MAX_CHARS = 150_000;
+
     @PostMapping("/analyze")
     public ResponseEntity<?> analyze(@RequestBody(required = false) AnalyzeRequest request) {
         if (request == null || request.text() == null || request.text().isBlank()) {
             return ResponseEntity.badRequest().body("text is required");
+        }
+        if (request.text().length() > MAX_CHARS) {
+            return ResponseEntity.badRequest().body("text exceeds maximum length of " + MAX_CHARS + " characters");
         }
         return ResponseEntity.ok(service.analyze(request.text()));
     }

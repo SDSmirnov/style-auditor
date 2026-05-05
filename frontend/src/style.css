@@ -565,6 +565,11 @@ textarea {
   align-self: center;
 }
 
+.wordCount.error {
+  color: #ef4444;
+  font-weight: 600;
+}
+
 .legendBody {
   padding: 4px 16px 16px;
   display: flex;

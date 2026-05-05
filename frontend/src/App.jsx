@@ -48,6 +48,8 @@ export default function App() {
     setActiveChunk(null);
   }
 
+  const MAX_CHARS = 150_000;
+  const charCount = text.length;
   const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
   const shownChunks = result
       ? activeChunk === null
@@ -72,11 +74,14 @@ export default function App() {
               />
             </label>
 
-            <button onClick={analyze} disabled={loading || wordCount < 50}>
+            <button onClick={analyze} disabled={loading || wordCount < 50 || charCount > MAX_CHARS}>
               {loading ? "Проверяю..." : "Проверить"}
             </button>
             {wordCount < 50 && (
               <span className="wordCount">{wordCount} / 50 слов</span>
+            )}
+            {charCount > MAX_CHARS && (
+              <span className="wordCount error">{charCount.toLocaleString("ru")} / 150 000 симв.</span>
             )}
           </div>
 
