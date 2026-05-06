@@ -165,7 +165,7 @@ class CustomPatternChecksTest {
     void triple_detectedForThreeAdjectivesWithoutConjunction() {
         // "A, B, C существительное" — без союза
         var result = run(new PatternTripleEnumerationCheck(),
-                "Алрина обнаружила за поворотом край пахотных, зелёных, вонючих полей.");
+                "Он вошёл в тёмный, холодный, пустой зал.");
         assertThat(result.flags()).isNotEmpty();
     }
 
