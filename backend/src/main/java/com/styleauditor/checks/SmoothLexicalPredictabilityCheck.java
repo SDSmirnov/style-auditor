@@ -48,7 +48,7 @@ public class SmoothLexicalPredictabilityCheck implements TextCheck {
         CheckResult result = new CheckResult()
                 .addMetric("lexicalPredictability", Math.round(value));
 
-        if (value >= 38) {
+        if (value >= 45) {
             String severity = value >= 58 ? "high" : "medium";
 
             result.addFlag(

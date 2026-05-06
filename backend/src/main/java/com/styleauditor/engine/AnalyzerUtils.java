@@ -231,12 +231,9 @@ public final class AnalyzerUtils {
             Set<String> seenInChunk = new HashSet<>();
 
             chunk.flags().forEach(flag -> {
-                stats.computeIfAbsent(flag.type(), key -> new int[]{0, 0});
-                stats.get(flag.type())[1] += flag.count();
-
-                if (seenInChunk.add(flag.type())) {
-                    stats.get(flag.type())[0]++;
-                }
+                int[] arr = stats.computeIfAbsent(flag.type(), key -> new int[]{0, 0});
+                arr[1] += flag.count();
+                if (seenInChunk.add(flag.type())) arr[0]++;
             });
         }
 

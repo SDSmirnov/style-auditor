@@ -67,12 +67,19 @@ public class AnalysisService {
             chunks.add(analyzeChunk(i, chunkTexts.get(i)));
         }
 
-        double averageRisk = chunks.stream().mapToDouble(ChunkResult::riskScore).average().orElse(0);
-        double avgSentenceLength = chunks.stream().mapToDouble(ChunkResult::avgSentenceLength).average().orElse(0);
-        double avgSentenceStd = chunks.stream().mapToDouble(ChunkResult::sentenceLengthStd).average().orElse(0);
-
-        int suspicious = (int) chunks.stream().filter(chunk -> chunk.riskScore() >= 35).count();
-        int strong = (int) chunks.stream().filter(chunk -> chunk.riskScore() >= 60).count();
+        double sumRisk = 0, sumLen = 0, sumStd = 0;
+        int suspicious = 0, strong = 0;
+        for (ChunkResult chunk : chunks) {
+            sumRisk += chunk.riskScore();
+            sumLen += chunk.avgSentenceLength();
+            sumStd += chunk.sentenceLengthStd();
+            if (chunk.riskScore() >= 35) suspicious++;
+            if (chunk.riskScore() >= 60) strong++;
+        }
+        int n = chunks.size();
+        double averageRisk = n == 0 ? 0 : sumRisk / n;
+        double avgSentenceLength = n == 0 ? 0 : sumLen / n;
+        double avgSentenceStd = n == 0 ? 0 : sumStd / n;
 
         String label = averageRisk < 30
                 ? "низкая сглаженность"
@@ -97,7 +104,6 @@ public class AnalysisService {
         );
 
         return new AnalysisResult(
-                "Единый анализ",
                 AnalyzerUtils.round(averageRisk),
                 label,
                 verdict,
