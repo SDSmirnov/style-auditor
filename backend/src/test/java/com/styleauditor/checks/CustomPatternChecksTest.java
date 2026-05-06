@@ -82,6 +82,18 @@ class CustomPatternChecksTest {
     }
 
     @Test
+    void hook_notDetectedForSectionTitles() {
+        var result = run(new PatternHookParagraphCheck(), "Пролог.\nДавным-давно в далёкой стране жил король.");
+        assertThat(result.flags()).isEmpty();
+    }
+
+    @Test
+    void hook_notDetectedForEpilog() {
+        var result = run(new PatternHookParagraphCheck(), "Эпилог.\nПрошло десять лет после тех событий.");
+        assertThat(result.flags()).isEmpty();
+    }
+
+    @Test
     void hook_notDetectedForRegularText() {
         var result = run(new PatternHookParagraphCheck(),
                 "Он пришёл домой поздно вечером. Ужин уже остыл.");

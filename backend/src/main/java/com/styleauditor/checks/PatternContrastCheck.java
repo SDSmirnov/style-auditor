@@ -4,8 +4,8 @@ import java.util.regex.Pattern;
 
 public class PatternContrastCheck extends RegexCheck {
     private static final Pattern PATTERN = Pattern.compile(
-            "\\b\u044d\u0442\u043e\\s+\u043d\u0435\\b.{0,120}?\\b\u044d\u0442\u043e\\b",
-            Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.UNICODE_CHARACTER_CLASS | Pattern.DOTALL
+            "\\b\u044d\u0442\u043e\\s+\u043d\u0435\\b[^.!?\u2026]{0,120}?\\b\u044d\u0442\u043e\\b",
+            Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.UNICODE_CHARACTER_CLASS
     );
 
     @Override

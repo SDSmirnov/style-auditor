@@ -68,6 +68,14 @@ class RegexPatternChecksTest {
         assertThat(result.flags()).isEmpty();
     }
 
+    @Test
+    void contrast_notDetectedAcrossSentenceBoundary() {
+        // второе "это" находится в другом предложении — не паттерн
+        var result = run(new PatternContrastCheck(),
+                "Это не первый случай в нашей практике. Мы видели это раньше.");
+        assertThat(result.flags()).isEmpty();
+    }
+
     // ── PatternHyperboleCheck ───────────────────────────────────────────────
 
     @Test
