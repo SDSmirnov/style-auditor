@@ -168,6 +168,14 @@ class CustomPatternChecksTest {
         assertThat(result.flags()).isEmpty();
     }
 
+    @Test
+    void triple_notDetectedForConjunctionParticleAsElement() {
+        // "тянет, но и не" — "но" союз, "не" частица, не список
+        var result = run(new PatternTripleEnumerationCheck(),
+                "Забор какой-то странный: на крепостную стену не тянет, но и не деревенский частокол.");
+        assertThat(result.flags()).isEmpty();
+    }
+
     // ── PatternTwoAdjectivesCheck ───────────────────────────────────────────
 
     @Test

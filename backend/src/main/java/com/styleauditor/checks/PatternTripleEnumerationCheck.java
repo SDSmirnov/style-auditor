@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class PatternTripleEnumerationCheck implements TextCheck {
     private static final Pattern PATTERN = Pattern.compile(
-            "\\b[\\p{L}]+\\b\\s*,\\s*\\b[\\p{L}]+\\b\\s+(?:и|или)\\s+\\b[\\p{L}]+\\b",
+            "\\b[\\p{L}]{3,}\\b\\s*,\\s*\\b[\\p{L}]{3,}\\b\\s+(?:и|или)\\s+\\b[\\p{L}]{3,}\\b",
             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.UNICODE_CHARACTER_CLASS
     );
 
