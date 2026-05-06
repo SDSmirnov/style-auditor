@@ -754,3 +754,70 @@ textarea {
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Common problems ── */
+.commonProblems {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #eadfcd;
+}
+
+.commonProblemsTitle {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #9ca3af;
+}
+
+.problemList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.problemItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 0.85rem;
+}
+
+.problemBar {
+  position: absolute;
+  inset: 0;
+  background: rgba(33, 27, 22, 0.05);
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.problemName {
+  position: relative;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #374151;
+}
+
+.problemMeta {
+  position: relative;
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.problemMeta b {
+  color: #374151;
+  font-weight: 600;
+}
