@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 public class PatternBoldMarkCheck implements TextCheck {
     private static final Pattern PATTERN = Pattern.compile(
             "(\\*\\*[^*]+\\*\\*|<b>.*?</b>|<strong>.*?</strong>)",
-            Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.DOTALL
+            Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.UNICODE_CHARACTER_CLASS | Pattern.DOTALL
     );
 
     @Override

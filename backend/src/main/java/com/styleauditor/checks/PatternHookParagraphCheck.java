@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 public class PatternHookParagraphCheck implements TextCheck {
     private static final Pattern PATTERN = Pattern.compile(
             "(^|\\R)\\s*[А-ЯЁA-Z][а-яёa-z]{2,15}\\.",
-            Pattern.UNICODE_CASE
+            Pattern.UNICODE_CASE | Pattern.UNICODE_CHARACTER_CLASS
     );
 
     @Override

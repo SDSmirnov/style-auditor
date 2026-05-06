@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 public class PatternTwoAdjectivesCheck implements TextCheck {
     private static final Pattern PATTERN = Pattern.compile(
             "\\b[а-яё]+(?:ый|ий|ой|ая|яя|ое|ее|ые|ие|ым|им|ой|ою|ыми|ими)\\b\\s*,\\s*\\b[а-яё]+(?:ый|ий|ой|ая|яя|ое|ее|ые|ие|ым|им|ой|ою|ыми|ими)\\b\\s+\\b[а-яё]{3,}\\b",
-            Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
+            Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.UNICODE_CHARACTER_CLASS
     );
 
     @Override
