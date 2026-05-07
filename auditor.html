@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Аудит стиля</title>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f4f1ea; color: #211b16; }
+.page { position: relative; width: min(1280px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 64px; }
+.legend { display: flex; flex-wrap: wrap; gap: 10px; }
+.legend-item { border-radius: 999px; padding: 8px 12px; font-size: 14px; border: 1px solid #ded2bf; background: white; }
+.legendSpoiler { margin-top: 16px; background: #fffefb; border: 1px solid #e2d8c8; border-radius: 18px; padding: 12px 14px; }
+.legendSpoiler summary { cursor: pointer; font-weight: 800; color: #2b2117; }
+.legendBody { padding: 4px 16px 16px; display: flex; flex-direction: column; gap: 20px; }
+.legendSection h4 { margin: 0 0 8px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+.legendColors { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; font-size: 0.9rem; color: #374151; }
+.legendColors mark { margin-right: 6px; padding: 1px 6px; border-radius: 4px; }
+.legendList { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; font-size: 0.88rem; }
+.legendList dt { font-weight: 600; color: #111827; white-space: nowrap; }
+.legendList dd { margin: 0; color: #374151; }
+.legendText { margin: 0; font-size: 0.88rem; color: #374151; line-height: 1.6; }
+.inputPanel, .summaryCard, .problems, .chunk, .chunkList { background: #fffaf1; border: 1px solid #e2d8c8; border-radius: 22px; box-shadow: 0 12px 36px rgba(61,45,28,0.07); }
+.inputPanel { margin-top: 18px; padding: 18px; }
+.toolbar { display: flex; gap: 12px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; }
+button, .fileButton { border: 0; background: #211b16; color: white; border-radius: 14px; padding: 11px 14px; display: inline-flex; align-items: center; gap: 8px; font-weight: 700; cursor: pointer; font-size: 14px; }
+button:disabled { opacity: 0.55; cursor: default; }
+.fileButton input { display: none; }
+textarea { width: 100%; min-height: 260px; resize: vertical; padding: 18px; border: 1px solid #ddcfbd; border-radius: 18px; background: #fffefb; color: #211b16; font-size: 16px; line-height: 1.65; font-family: inherit; }
+.summaryCard { padding: 18px; }
+.layout { display: grid; grid-template-columns: 260px 1fr; gap: 18px; margin-top: 18px; align-items: start; }
+.chunkList { padding: 14px; position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto; }
+.chunkList h2 { margin: 0 0 12px; }
+.chunkButton { width: 100%; margin-bottom: 8px; justify-content: space-between; background: white; color: #211b16; border: 1px solid #e4d7c4; border-radius: 14px; padding: 11px 14px; display: flex; flex-direction: column; align-items: flex-start; cursor: pointer; font-weight: 700; font-size: 14px; }
+.chunkButton.active { outline: 3px solid #2b2117; }
+.chunkButton.high { border-color: #e66a6a; }
+.chunkButton.medium { border-color: #d8a623; }
+.chunkButton.low { border-color: #7fb585; }
+.chunkButton small { display: block; width: 100%; color: #7b6f62; text-align: left; margin-top: 4px; font-weight: 400; }
+.chunks { display: grid; gap: 18px; }
+.chunk { padding: 18px; }
+.chunkHeader { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; }
+.chunkHeader h3 { margin: 0; }
+.meta { color: #7b6f62; margin: 4px 0 0; }
+.riskBadge { min-width: 76px; text-align: center; border-radius: 16px; padding: 12px; font-weight: 800; }
+.riskBadge.high { background: #ffe1e1; color: #8f1717; }
+.riskBadge.medium { background: #fff0bc; color: #7b5300; }
+.riskBadge.low { background: #e5f5df; color: #2d6b2f; }
+.meters { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+.meter { background: white; border: 1px solid #eadfcd; border-radius: 16px; padding: 12px; }
+.meterTop { display: flex; justify-content: space-between; gap: 12px; }
+.meterBar { height: 8px; background: #eee4d5; border-radius: 999px; overflow: hidden; margin-top: 10px; }
+.meterBar div { height: 100%; background: #211b16; }
+.meterHint { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; margin-left: 5px; border-radius: 50%; background: #c9bfb0; color: #fff; font-size: 9px; font-weight: 700; font-style: normal; cursor: help; vertical-align: middle; }
+.flags { display: grid; gap: 10px; margin: 14px 0; }
+.flag { border-radius: 16px; padding: 12px; border: 1px solid; }
+.flag.high { background: rgba(239,68,68,0.14); border-color: rgba(239,68,68,0.45); }
+.flag.medium { background: rgba(245,158,11,0.18); border-color: rgba(245,158,11,0.45); }
+.flag.low { background: rgba(34,197,94,0.14); border-color: rgba(34,197,94,0.45); }
+.flagRow { display: flex; justify-content: space-between; gap: 10px; }
+.flag p { margin: 6px 0 0; color: #6f6255; }
+.clean { display: flex; align-items: center; gap: 8px; background: #eef8e9; border-radius: 16px; padding: 12px; }
+.suggestions { background: white; border: 1px solid #eadfcd; border-radius: 16px; padding: 12px; margin: 14px 0; }
+.suggestions h3 { margin: 0 0 8px; }
+.suggestions ul { margin: 0; padding-left: 20px; color: #6f6255; }
+.textBlock { white-space: pre-wrap; line-height: 1.8; font-size: 17px; background: #fffefb; border: 1px solid #eadfcd; border-radius: 18px; padding: 18px; word-break: break-word; }
+.highlight { border-radius: 5px; padding: 1px 3px; }
+.highlight.high { background: #ffb4b4; color: #581111; }
+.highlight.medium { background: #ffe182; color: #4f3300; }
+.highlight.low { background: #dff0d6; color: #244f24; }
+.summaryBox { margin: 20px 0; padding: 16px 18px; border-radius: 16px; border: 1px solid rgba(148,163,184,0.35); background: #ffffff; box-shadow: 0 8px 24px rgba(15,23,42,0.06); }
+.summaryBox h2 { margin: 0 0 6px; color: #111827; }
+.summaryVerdict { margin: 6px 0; color: #374151; }
+.summaryNote { margin-top: 8px; font-size: 13px; color: #64748b; }
+.summaryBox.stale { border-color: rgba(245,158,11,0.5); }
+.staleNotice { margin: 0 0 8px; font-size: 0.82rem; color: #92400e; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.35); border-radius: 8px; padding: 6px 10px; }
+.siteLogo { position: absolute; top: 16px; right: 16px; width: 72px; height: 72px; border-radius: 50%; object-fit: cover; }
+.siteFooter { margin-top: 40px; padding: 16px 0; text-align: center; font-size: 0.8rem; color: #9ca3af; }
+.wordCount { font-size: 0.85rem; color: #9ca3af; align-self: center; }
+.wordCount.error { color: #ef4444; font-weight: 600; }
+.chunkExplanation { margin: 0 0 12px; font-size: 0.85rem; color: #6b7280; line-height: 1.5; }
+.errorBanner { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; padding: 10px 14px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.4); border-radius: 10px; font-size: 0.9rem; color: #b91c1c; }
+.errorDismiss { background: none; border: none; color: #b91c1c; font-size: 1rem; padding: 0 4px; cursor: pointer; flex-shrink: 0; }
+@keyframes shimmer { 0% { background-position: -600px 0; } 100% { background-position: 600px 0; } }
+.skeletonWrap { margin-top: 20px; }
+.skeletonBox, .skeletonChunkBtn, .skeletonLine, .skeletonBlock { background: linear-gradient(90deg,#e8e0d4 25%,#f0ead8 50%,#e8e0d4 75%); background-size: 600px 100%; animation: shimmer 1.4s infinite linear; border-radius: 10px; }
+.skeletonSummary { height: 90px; margin-bottom: 16px; }
+.skeletonLayout { display: grid; grid-template-columns: 200px 1fr; gap: 16px; }
+.skeletonSidebar { display: flex; flex-direction: column; gap: 8px; }
+.skeletonChunkBtn { height: 60px; }
+.skeletonMain { display: flex; flex-direction: column; gap: 12px; }
+.skeletonLine { height: 14px; }
+.skeletonLine.wide { width: 80%; }
+.skeletonLine.medium { width: 55%; }
+.skeletonLine.short { width: 35%; }
+.skeletonBlock { height: 120px; }
+@media (max-width: 900px) {
+  .layout, .meters { grid-template-columns: 1fr; }
+  .chunkList { position: static; }
+  .skeletonLayout { grid-template-columns: 1fr; }
+}
+.commonProblems { margin-top: 14px; padding-top: 12px; border-top: 1px solid #eadfcd; }
+.commonProblemsTitle { margin: 0 0 8px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #9ca3af; }
+.problemList { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
+.problemItem { position: relative; display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 8px; overflow: hidden; font-size: 0.85rem; }
+.problemBar { position: absolute; inset: 0; background: rgba(33,27,22,0.05); border-radius: 8px; pointer-events: none; }
+.problemName { position: relative; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #374151; }
+.problemMeta { position: relative; display: flex; gap: 6px; flex-shrink: 0; font-size: 0.8rem; color: #9ca3af; }
+.problemMeta b { color: #374151; font-weight: 600; }
+@media (max-width: 600px) {
+  .siteLogo { position: static; width: 48px; height: 48px; flex-shrink: 0; }
+  h1 { display: flex; align-items: center; gap: 12px; font-size: 1.3rem; }
+}
+</style>
+</head>
+<body>
+<main class="page">
+  <h1>Аудит стиля (детектор графомании)</h1>
+
+  <section class="inputPanel">
+    <div class="toolbar">
+      <label class="fileButton">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Загрузить .txt
+        <input type="file" id="fileInput" accept=".txt,text/plain">
+      </label>
+      <button id="analyzeBtn" disabled>Проверить</button>
+      <button id="clearBtn" style="display:none">Очистить</button>
+      <span id="wordCountEl" class="wordCount"></span>
+    </div>
+    <div id="errorBanner" class="errorBanner" style="display:none">
+      <span id="errorText"></span>
+      <button class="errorDismiss" id="dismissError">✕</button>
+    </div>
+    <textarea id="textArea" placeholder="Вставьте текст или загрузите .txt..."></textarea>
+  </section>
+
+  <details class="legendSpoiler">
+    <summary>Легенда</summary>
+    <div class="legendBody">
+      <section class="legendSection">
+        <h4>Индекс чанка</h4>
+        <p class="legendText">Число от 0 до 100. Складывается из штрафных баллов за каждый найденный паттерн — чем серьёзнее паттерн, тем больше очков он даёт. Метрики сглаженности (ритм, лексика) добавляют баллы сверху. Несколько паттернов на одном участке перекрываются и окрашиваются красным. Итоговый балл не суммируется по чанкам: каждый оценивается независимо.</p>
+      </section>
+      <section class="legendSection">
+        <h4>Цвета подсветки</h4>
+        <ul class="legendColors">
+          <li><mark class="highlight low">низкий</mark> — слабый сигнал, одиночный случай не критичен</li>
+          <li><mark class="highlight medium">средний</mark> — стоит обратить внимание при накоплении</li>
+          <li><mark class="highlight high">высокий</mark> — характерный паттерн, рекомендуется правка</li>
+        </ul>
+      </section>
+      <section class="legendSection">
+        <h4>Паттерны</h4>
+        <dl class="legendList">
+          <dt>Пункт 1</dt><dd>«Это не… Это…» — драматический контраст. Одиночный случай не страшен, опасно накопление.</dd>
+          <dt>Пункт 2</dt><dd>Серия коротких фраз подряд — три и более предложения длиной до 4 слов.</dd>
+          <dt>Пункт 3</dt><dd>Тройное перечисление. Нормальный приём, но при избытке заметен.</dd>
+          <dt>Пункт 4</dt><dd>Псевдоафоризм — обобщающая фраза в конце абзаца.</dd>
+          <dt>Пункт 5</dt><dd>Эмоция-ярлык — абстрактное чувство в коротком отдельном предложении.</dd>
+          <dt>Пункт 6</dt><dd>«Не потому что… а потому что…» — объяснительная связка. Шаблонна при повторе.</dd>
+          <dt>Пункт 7</dt><dd>Зеркальное предложение — соседние фразы с перестановкой похожих слов.</dd>
+          <dt>Пункт 8</dt><dd>«Как будто / словно» — сравнения. В хорроре норма, но частый повтор заметен.</dd>
+          <dt>Пункт 9</dt><dd>Повтор начала предложений — соседние предложения начинаются с одного слова.</dd>
+          <dt>Пункт 11</dt><dd>Два прилагательных перед существительным через запятую.</dd>
+          <dt>Пункт 12</dt><dd>Тире вне диалога — частые тире в авторской речи. Диалоговые тире игнорируются.</dd>
+          <dt>Пункт 14</dt><dd>Гипербола — громкое усиление. Само по себе нормально, при избытке создаёт пафос.</dd>
+          <dt>Пункт 15</dt><dd>«Не просто… а…» — усилительная конструкция. Шаблонна при накоплении.</dd>
+          <dt>Пункт 16</dt><dd>Абзац-крючок — абзац начинается одиночным словом.</dd>
+          <dt>Пункт 17</dt><dd>Жирный текст внутри художественного фрагмента.</dd>
+          <dt>Пункт 18</dt><dd>Запах — сенсорное описание через обоняние. Проблемно, если встречается в каждой сцене.</dd>
+          <dt>Пункт 19</dt><dd>Помпезное сравнение — тёмная образность. Работает дозированно.</dd>
+          <dt>Пункт 20</dt><dd>«Нечто большее, чем…» — шаблонный оборот.</dd>
+        </dl>
+      </section>
+      <section class="legendSection">
+        <h4>Метрики сглаженности</h4>
+        <dl class="legendList">
+          <dt>S1 — Монотонный ритм</dt><dd>Предложения в чанке близки по длине — стандартное отклонение длин меньше 3 слов.</dd>
+          <dt>S2 — Общая оценочная лексика</dt><dd>Много размытых прилагательных (красивый, странный, тёмный и т.п.).</dd>
+          <dt>S3 — Предсказуемость лексики</dt><dd>Высокая доля частотных, абстрактных или взаимозаменяемых слов.</dd>
+        </dl>
+      </section>
+    </div>
+  </details>
+
+  <div id="skeletonWrap" class="skeletonWrap" style="display:none">
+    <div class="skeletonBox skeletonSummary"></div>
+    <div class="skeletonLayout">
+      <div class="skeletonSidebar">
+        <div class="skeletonChunkBtn"></div>
+        <div class="skeletonChunkBtn"></div>
+        <div class="skeletonChunkBtn"></div>
+      </div>
+      <div class="skeletonMain">
+        <div class="skeletonLine wide"></div>
+        <div class="skeletonLine medium"></div>
+        <div class="skeletonBlock"></div>
+        <div class="skeletonLine short"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="resultContainer" style="display:none">
+    <div id="summaryBox" class="summaryBox"></div>
+    <section class="layout">
+      <aside class="chunkList">
+        <h2>Чанки</h2>
+        <div id="chunkListItems"></div>
+      </aside>
+      <section id="chunksSection" class="chunks"></section>
+    </section>
+  </div>
+
+  <footer class="siteFooter">Сайт не несёт ответственности ни за что.</footer>
+</main>
+
+<script>
+'use strict';
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let currentResult = null;
+let activeChunk = null;
+let isStale = false;
+const MAX_CHARS = 200_000;
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+// Unicode-aware word boundaries (JS \b doesn't work for Cyrillic)
+const WB = '(?<![\\p{L}\\p{N}])';
+const WE = '(?![\\p{L}\\p{N}])';
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function findAllMatches(text, re) {
+  // Always use a fresh regex to avoid lastIndex issues
+  const r = new RegExp(re.source, re.flags.replace(/[^gimsuy]/g,'') + (re.flags.includes('g') ? '' : 'g'));
+  r.lastIndex = 0;
+  const results = [];
+  let m;
+  while ((m = r.exec(text)) !== null) {
+    results.push(m);
+    if (m[0].length === 0) r.lastIndex++;
+  }
+  return results;
+}
+
+function regexHighlights(text, re, type, severity) {
+  return findAllMatches(text, re).map(m => ({
+    start: m.index, end: m.index + m[0].length, type, severity
+  }));
+}
+
+function mergeHighlights(highlights) {
+  if (!highlights.length) return [];
+  const sorted = [...highlights]
+    .filter(h => h.start >= 0 && h.end > h.start)
+    .sort((a, b) => a.start - b.start || a.end - b.end);
+  const result = [];
+  for (const cur of sorted) {
+    if (!result.length) { result.push({...cur}); continue; }
+    const last = result[result.length - 1];
+    if (cur.start < last.end) {
+      result[result.length - 1] = {
+        start: last.start,
+        end: Math.max(last.end, cur.end),
+        type: last.type + ' / ' + cur.type,
+        severity: 'high'
+      };
+    } else {
+      result.push({...cur});
+    }
+  }
+  return result;
+}
+
+function splitChunks(text, targetSize) {
+  const clean = (text || '').trim();
+  if (!clean) return [''];
+  const chunks = [];
+  let cursor = 0;
+  while (cursor < clean.length) {
+    let end = Math.min(clean.length, cursor + targetSize);
+    if (end < clean.length) {
+      const pb = clean.lastIndexOf('\n\n', end);
+      const sb = Math.max(
+        clean.lastIndexOf('. ', end),
+        clean.lastIndexOf('! ', end),
+        clean.lastIndexOf('? ', end)
+      );
+      if (pb > cursor + targetSize / 2) end = pb + 2;
+      else if (sb > cursor + targetSize / 2) end = sb + 2;
+    }
+    const chunk = clean.slice(cursor, end).trim();
+    if (chunk) chunks.push(chunk);
+    cursor = end;
+  }
+  return chunks.length ? chunks : [''];
+}
+
+function parseSentences(text) {
+  const re = /[^.!?…]+[.!?…]+|[^.!?…]+$/gsu;
+  const sentences = [], positions = [];
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    let s = m.index, e = m.index + m[0].length;
+    while (s < e && /\s/.test(text[s])) s++;
+    while (e > s && /\s/.test(text[e - 1])) e--;
+    const sentence = text.slice(s, e);
+    if (sentence.trim()) {
+      sentences.push(sentence);
+      positions.push([s, e]);
+    }
+  }
+  return { sentences, positions };
+}
+
+function wordCount(text) {
+  return (text.match(/[\p{L}\p{N}]+/giu) || []).length;
+}
+
+function firstWord(text) {
+  const m = text.match(/[\p{L}\p{N}]+/u);
+  return m ? m[0] : '';
+}
+
+const STOP_WORDS = new Set([
+  'он','она','они','это','не','и','а','но','его','ее','её','их',
+  'в','на','с','к','по','как','что','для','там','тут','был','была',
+  'были','есть','себя','свой','своя','своё','чтобы','когда','потом'
+]);
+
+function significantWords(text) {
+  const words = text.toLowerCase().match(/[\p{L}]{4,}/giu) || [];
+  const result = new Set();
+  for (const w of words) { if (!STOP_WORDS.has(w)) result.add(w); }
+  return result;
+}
+
+function stdDev(values, avg) {
+  if (!values.length) return 0;
+  const variance = values.reduce((s, v) => s + (v - avg) ** 2, 0) / values.length;
+  return Math.sqrt(variance);
+}
+
+function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+function rnd(v) { return Math.round(v); }
+
+function labelFor(score) {
+  if (score >= 60) return 'высокий риск сглаженности';
+  if (score >= 35) return 'умеренный риск';
+  return 'низкий риск';
+}
+
+function riskClass(score) {
+  if (score >= 60) return 'high';
+  if (score >= 35) return 'medium'; // frontend uses 30 for display, 35 for counting
+  return 'low';
+}
+
+// ─── CHECKS ──────────────────────────────────────────────────────────────────
+
+function emptyResult() {
+  return { flags: [], highlights: [], suggestions: [], score: 0, metrics: {} };
+}
+
+function regexCheck(text, re, type, severity, comment, weight, doHighlight = true) {
+  const found = regexHighlights(text, re, type, severity);
+  if (!found.length) return emptyResult();
+  const r = emptyResult();
+  if (doHighlight) r.highlights = found;
+  r.flags = [{ type, severity, count: found.length, comment }];
+  r.score = found.length * weight;
+  if (!doHighlight) r.suggestions = [`Флаг «${type}» считается по всему чанку и не подсвечивается поштучно.`];
+  return r;
+}
+
+// 1. Contrast "Это не… Это…"
+function checkContrast(ctx) {
+  const re = new RegExp(WB + 'это\\s+не' + WE + '[^.!?…]{0,120}?' + WB + 'это' + WE, 'giu');
+  return regexCheck(ctx.text, re, 'Это не… Это…', 'high',
+    'Пункт 1: драматический контраст «это не… это…». Одиночный случай не страшен, опасно накопление.', 14);
+}
+
+// 2. "Не потому что…, а потому что…"
+function checkBecause(ctx) {
+  const re = new RegExp(
+    WB + 'не\\s+потому\\s+что' + WE + '[\\s\\S]{0,180}?' + WB + 'а\\s+потому\\s+что' + WE, 'giu');
+  return regexCheck(ctx.text, re, 'Не потому что…, а потому что…', 'high',
+    'Пункт 6: объяснительная связка, которая часто выглядит шаблонно при повторе.', 14);
+}
+
+// 3. "Не просто…, а…"
+function checkNotJust(ctx) {
+  const re = new RegExp(WB + 'не\\s+просто' + WE + '[\\s\\S]{0,160}?' + WB + 'а' + WE, 'giu');
+  return regexCheck(ctx.text, re, 'Не просто…, а…', 'high',
+    'Пункт 15: конструкция «не просто…, а…». При накоплении выглядит как усилитель.', 14);
+}
+
+// 4. "Нечто большее, чем…"
+function checkMoreThan(ctx) {
+  const re = new RegExp(WB + 'нечто\\s+большее\\s*,?\\s+чем' + WE, 'giu');
+  return regexCheck(ctx.text, re, 'Нечто большее, чем…', 'high',
+    'Пункт 20: шаблон «нечто большее, чем…».', 15);
+}
+
+// 5. "Как будто / будто / словно"
+function checkAsIf(ctx) {
+  const re = new RegExp(WB + '(как\\s+будто|будто|словно)' + WE, 'giu');
+  return regexCheck(ctx.text, re, 'Как будто / будто / словно', 'medium',
+    'Пункт 8: сравнения через «будто/словно».', 6);
+}
+
+// 6. Pseudo-aphorisms
+function checkPseudoAphorism(ctx) {
+  const re = new RegExp(
+    WB + '(тишина\\s+бывает\\s+громче|чтобы\\s+выжить|назад\\s+пути\\s+нет|' +
+    'это\\s+был\\s+не\\s+конец|всё\\s+только\\s+началось|мир\\s+уже\\s+не\\s+будет\\s+прежним)' + WE, 'giu');
+  return regexCheck(ctx.text, re, 'Псевдо-афоризмы', 'medium',
+    'Пункт 4: похоже на афористичную обобщающую фразу.', 9);
+}
+
+// 7. Hyperbole
+function checkHyperbole(ctx) {
+  const re = new RegExp(
+    WB + '(оглушающ[\\p{L}]+|всепоглощающ[\\p{L}]+|первобытн[\\p{L}]+|судьбоносн[\\p{L}]+|' +
+    'единственно\\s+возможн[\\p{L}]+|абсолютно\\s+м[её]ртв[\\p{L}]+|невыносим[\\p{L}]+|' +
+    'бесконечн[\\p{L}]+|невероятн[\\p{L}]+|переломн[\\p{L}]+)' + WE, 'giu');
+  return regexCheck(ctx.text, re, 'Гиперболическое усиление', 'medium',
+    'Пункт 14: громкое усиление. Само по себе нормально, но при избытке создаёт пафос.', 7);
+}
+
+// 8. Smell checkbox
+function checkSmell(ctx) {
+  const re = new RegExp(
+    WB + '(пахло|запах|воняло|в\\s+нос\\s+ударил|' +
+    'потянуло\\s+[^.]{0,80}?(сыростью|земл[её]й|плесенью|аптекой|бинтами|дымом|навозом))' + WE, 'gius');
+  return regexCheck(ctx.text, re, 'Сенсорный чекбокс: запах', 'medium',
+    'Пункт 18: сенсорное описание через запах. Проблемно, если почти каждая сцена начинается с запаха.', 5);
+}
+
+// 9. Pompous comparisons
+function checkPompous(ctx) {
+  const re = new RegExp(
+    WB + 'как\\s+(гвоздь|кость|язык|слизняк|глаз|колодец|труп|могила|' +
+    'ржавый\\s+гвоздь|нож|рана|клякса|монета|водяной\\s+дымке)' + WE, 'giu');
+  return regexCheck(ctx.text, re, 'Пафосные сравнения', 'medium',
+    'Пункт 19: сильная мрачная образность. Работает дозированно.', 8);
+}
+
+// 10. Triple enumeration
+function checkTripleEnum(ctx) {
+  const W3 = WB + '[\\p{L}]{3,}' + WE;
+  const re = new RegExp(
+    W3 + '\\s*,\\s*' + W3 + '\\s+(?:и|или)\\s+' + W3 + '|' +
+    W3 + ',\\s*' + W3 + ',\\s*' + W3, 'giu');
+  const found = regexHighlights(ctx.text, re, 'Тройное перечисление', 'medium');
+  if (!found.length) return emptyResult();
+  const r = emptyResult();
+  r.highlights = found;
+  r.flags = [{ type: 'Тройные перечисления', severity: 'medium', count: found.length,
+    comment: 'Пункт 3: перечисления из трёх элементов. Это нормальный приём, но при избытке заметен.' }];
+  r.score = found.length * 7;
+  r.suggestions = ['Проверьте, не слишком ли часто в тексте идут ровные тройки.'];
+  return r;
+}
+
+// 11. Emotion labels (single-sentence abstract emotions)
+function checkEmotionLabel(ctx) {
+  const EMOTIONS = new Set(['боль','гнев','отчаяние','страх','ужас','пустота','тоска','ярость','надежда','покой']);
+  const r = emptyResult();
+  for (let i = 0; i < ctx.sentences.length; i++) {
+    const norm = ctx.sentences[i].toLowerCase().replace(/[^\p{L}]/giu, '').trim();
+    if (EMOTIONS.has(norm)) {
+      const [s, e] = ctx.positions[i];
+      r.highlights.push({ start: s, end: e, type: 'Эмоция-ярлык', severity: 'high' });
+    }
+  }
+  if (!r.highlights.length) return r;
+  r.flags = [{ type: 'Эмоции-ярлыки через точку', severity: 'high', count: r.highlights.length,
+    comment: 'Пункт 5: абстрактные эмоции отдельными короткими предложениями.' }];
+  r.score = r.highlights.length * 12;
+  r.suggestions = ['Часть эмоций-ярлыков можно заменить жестом, действием или предметной деталью.'];
+  return r;
+}
+
+// 12. Mirror sentences
+function checkMirrorSentences(ctx) {
+  const r = emptyResult();
+  for (let i = 0; i < ctx.sentences.length - 1; i++) {
+    const a = significantWords(ctx.sentences[i]);
+    const b = significantWords(ctx.sentences[i + 1]);
+    if (a.size >= 2 && b.size >= 2) {
+      let shared = 0;
+      for (const w of a) { if (b.has(w)) shared++; }
+      if (shared >= 2 && ctx.sentences[i].length < 90 && ctx.sentences[i + 1].length < 90) {
+        r.highlights.push({
+          start: ctx.positions[i][0], end: ctx.positions[i + 1][1],
+          type: 'Зеркальная пара предложений', severity: 'medium'
+        });
+      }
+    }
+  }
+  if (!r.highlights.length) return r;
+  r.flags = [{ type: 'Зеркальные предложения', severity: 'medium', count: r.highlights.length,
+    comment: 'Пункт 7: соседние фразы с перестановкой похожих слов.' }];
+  r.score = r.highlights.length * 10;
+  return r;
+}
+
+// 13. Hook paragraph
+const HOOK_STOPLIST = new Set([
+  'пролог','эпилог','предисловие','послесловие','введение','заключение',
+  'приложение','содержание','глава','часть','раздел','примечание','продолжение'
+]);
+function checkHookParagraph(ctx) {
+  const re = /^[ \t]*([А-ЯЁA-Z][а-яёa-z]{2,15}\.)/gmu;
+  const r = emptyResult();
+  let m;
+  while ((m = re.exec(ctx.text)) !== null) {
+    const wordStart = m.index + m[0].length - m[1].length;
+    const word = m[1].slice(0, -1).toLowerCase(); // strip trailing period
+    if (HOOK_STOPLIST.has(word)) continue;
+    r.highlights.push({ start: wordStart, end: m.index + m[0].length, type: 'Абзац-крючок', severity: 'medium' });
+  }
+  if (!r.highlights.length) return r;
+  r.flags = [{ type: 'Абзац-крючок', severity: 'medium', count: r.highlights.length,
+    comment: 'Пункт 16: абзац начинается одиночным словом-ориентиром.' }];
+  r.score = r.highlights.length * 8;
+  return r;
+}
+
+// 14. Bold marks
+function checkBoldMark(ctx) {
+  const re = /(\*\*[^*]+\*\*|<b>[\s\S]*?<\/b>|<strong>[\s\S]*?<\/strong>)/giu;
+  const found = regexHighlights(ctx.text, re, 'Жирное выделение', 'medium');
+  if (!found.length) return emptyResult();
+  const r = emptyResult();
+  r.highlights = found;
+  r.flags = [{ type: 'Жирное выделение', severity: 'medium', count: found.length,
+    comment: 'Пункт 17: выделение слов жирным внутри художественного текста.' }];
+  r.score = found.length * 10;
+  return r;
+}
+
+// 15. Short phrase series
+function checkShortPhraseSeries(ctx) {
+  const r = emptyResult();
+  const ranges = [];
+  let runStart = -1, runCount = 0;
+  for (let i = 0; i < ctx.sentences.length; i++) {
+    const len = wordCount(ctx.sentences[i]);
+    if (len > 0 && len <= 4) {
+      if (runCount === 0) runStart = ctx.positions[i][0];
+      runCount++;
+      if (runCount === 3) {
+        ranges.push([runStart, ctx.positions[i][1]]);
+      } else if (runCount > 3 && ranges.length) {
+        ranges[ranges.length - 1] = [ranges[ranges.length - 1][0], ctx.positions[i][1]];
+      }
+    } else {
+      runStart = -1; runCount = 0;
+    }
+  }
+  if (!ranges.length) return r;
+  const severity = ranges.length >= 2 ? 'high' : 'medium';
+  r.highlights = ranges.map(([s, e]) => ({ start: s, end: e, type: 'Серия коротких фраз', severity }));
+  r.flags = [{ type: 'Серии коротких фраз', severity, count: ranges.length,
+    comment: 'Пункт 2: несколько коротких фраз подряд или похожая монтажная серия.' }];
+  r.score = ranges.length * 11;
+  r.suggestions = ['Разбавьте серию коротких фраз одним более длинным предложением или бытовой деталью.'];
+  return r;
+}
+
+// 16. Repeated sentence starts
+function checkRepeatedStart(ctx) {
+  const r = emptyResult();
+  let prev = '', prevStart = -1;
+  for (let i = 0; i < ctx.sentences.length; i++) {
+    const fw = firstWord(ctx.sentences[i]).toLowerCase();
+    if (!fw) continue;
+    if (fw === prev) {
+      r.highlights.push({
+        start: prevStart >= 0 ? prevStart : ctx.positions[i][0],
+        end: ctx.positions[i][1],
+        type: `Повтор начала предложений: «${fw}»`, severity: 'low'
+      });
+    }
+    prev = fw; prevStart = ctx.positions[i][0];
+  }
+  if (!r.highlights.length) return r;
+  const severity = r.highlights.length >= 2 ? 'medium' : 'low';
+  r.highlights = r.highlights.map(h => ({ ...h, severity }));
+  r.flags = [{ type: 'Повтор начала предложений', severity, count: r.highlights.length,
+    comment: 'Пункт 9: соседние предложения начинаются одинаково или почти одинаково.' }];
+  r.score = r.highlights.length * 6;
+  return r;
+}
+
+const TWO_ADJ_PREPS = new Set([
+  'в','во','за','на','по','к','от','до','из','со','при','без',
+  'под','над','про','для','у','с','о','об','обо','перед','между','через','около','после','вместо','кроме'
+]);
+function precededByPreposition(text, pos) {
+  let i = pos - 1;
+  while (i >= 0 && text[i] === ' ') i--;
+  const wordEnd = i + 1;
+  while (i >= 0 && /\p{L}/u.test(text[i])) i--;
+  if (i + 1 === wordEnd) return false;
+  return TWO_ADJ_PREPS.has(text.slice(i + 1, wordEnd).toLowerCase());
+}
+
+// 17. Two adjectives before noun
+function checkTwoAdjectives(ctx) {
+  const adj = '[а-яё]+(?:ый|ий|ой|ая|яя|ое|ее|ые|ие|ым|им|ою|ыми|ими)';
+  const re = new RegExp(
+    '(?<![а-яё])' + adj + '(?![а-яё])\\s*,\\s*(?<![а-яё])' + adj + '(?![а-яё])\\s+(?<![а-яё])[а-яё]{3,}(?![а-яё])',
+    'giu');
+  const found = regexHighlights(ctx.text, re, 'Два определения перед существительным', 'medium');
+  const filtered = found.filter(h => !precededByPreposition(ctx.text, h.start));
+  if (!filtered.length) return emptyResult();
+  const severity = filtered.length >= 3 ? 'high' : 'medium';
+  const r = emptyResult();
+  r.highlights = filtered.map(h => ({ ...h, severity }));
+  r.flags = [{ type: 'Переизбыток определений', severity, count: filtered.length,
+    comment: 'Пункт 11: рядом с существительным стоят два определения через запятую.' }];
+  r.score = filtered.length * 9;
+  return r;
+}
+
+// 18. Dash outside dialogue
+function checkDashOutsideDialogue(ctx) {
+  const text = ctx.text;
+  const ranges = [];
+  for (let i = 0; i < text.length; i++) {
+    if (text[i] !== '—') continue;
+    if (!isDialogueDash(text, i)) ranges.push([i, i + 1]);
+  }
+  if (ranges.length < 4) return emptyResult();
+  const severity = ranges.length >= 8 ? 'high' : 'medium';
+  const r = emptyResult();
+  r.highlights = ranges.map(([s, e]) => ({ start: s, end: e, type: 'Интонационное тире', severity }));
+  r.flags = [{ type: 'Интонационные тире', severity, count: ranges.length,
+    comment: 'Пункт 12: частые тире внутри авторской речи. Диалоговые тире в начале строки игнорируются.' }];
+  r.score = ranges.length * 12;
+  r.suggestions = ['Проверьте тире в авторской речи: часть можно заменить запятой, точкой или убрать.'];
+  return r;
+}
+
+function isDialogueDash(text, idx) {
+  let i = idx - 1;
+  while (i >= 0 && text[i] === ' ') i--;
+  if (i < 0) return true;
+  const prev = text[i];
+  if (prev === '\n' || prev === '\r') return true;
+  if ('?!.,»'.includes(prev)) return isOnDialogueLine(text, idx);
+  return false;
+}
+
+function isOnDialogueLine(text, idx) {
+  let ls = idx;
+  while (ls > 0 && text[ls - 1] !== '\n' && text[ls - 1] !== '\r') ls--;
+  while (ls < idx && text[ls] === ' ') ls++;
+  return ls < text.length && text[ls] === '—';
+}
+
+// 19. Lexical predictability
+const COMMON_WORDS = new Set([
+  'и','в','во','не','на','он','она','они','а','но','что','как','к','с','по','из','у','за','для','это',
+  'его','её','их','был','была','были','есть','же','там','тут','всё','все','или','то','от','до','потом','сначала'
+]);
+const ABSTRACT_EMOTIONS = new Set([
+  'страх','тревога','боль','пустота','отчаяние','надежда','радость','злость','обида','паника','ужас','сомнение','счастье','одиночество','вина','стыд'
+]);
+const GENERIC_PERCEPTION = new Set([
+  'понял','поняла','почувствовал','почувствовала','увидел','увидела','заметил','заметила','услышал','услышала','подумал','подумала','вспомнил','вспомнила','показалось','казалось'
+]);
+const SMOOTH_CONNECTORS = new Set([
+  'словно','будто','вдруг','неожиданно','почему-то','почти','очень','просто','медленно','тихо','быстро'
+]);
+
+function checkLexicalPredictability(ctx) {
+  const text = ctx.text;
+  if (!text.trim()) return emptyResult();
+  const words = (text.toLowerCase().match(/[\p{L}\p{N}]+/giu) || []);
+  if (!words.length) return emptyResult();
+  const total = words.length;
+  let common = 0, shortW = 0, longW = 0, abstr = 0, percep = 0, conn = 0;
+  const unique = new Set();
+  for (const w of words) {
+    unique.add(w);
+    if (COMMON_WORDS.has(w)) common++;
+    if (w.length <= 3) shortW++;
+    if (w.length >= 11) longW++;
+    if (ABSTRACT_EMOTIONS.has(w)) abstr++;
+    if (GENERIC_PERCEPTION.has(w)) percep++;
+    if (SMOOTH_CONNECTORS.has(w)) conn++;
+  }
+  const commonR = common * 100 / total;
+  const shortR = shortW * 100 / total;
+  const uniqueR = unique.size * 100 / total;
+  const longR = longW * 100 / total;
+  const abstrR = abstr * 100 / total;
+  const percepR = percep * 100 / total;
+  const connR = conn * 100 / total;
+  const value = clamp(
+    24 + commonR * 0.75 + shortR * 0.10 + abstrR * 2.0 + percepR * 1.6 + connR * 1.5 - uniqueR * 0.12 - longR * 0.30,
+    0, 100
+  );
+  const r = emptyResult();
+  r.metrics = { lexicalPredictability: Math.round(value) };
+  if (value >= 38) {
+    const severity = value >= 58 ? 'high' : 'medium';
+    r.flags = [{ type: 'Высокая предсказуемость лексики', severity, count: 1,
+      comment: 'В чанке много частотных, абстрактных или универсальных слов. Это не признак ИИ сам по себе, а сигнал, что текст может звучать слишком ожидаемо.' }];
+    r.score = 1 * 1 + Math.max(0, (value - 45) * 0.35);
+    r.suggestions = ['Проверьте, можно ли заменить часть общих слов точными наблюдаемыми деталями: предмет, жест, звук, локальная особенность, конкретное действие.'];
+  }
+  return r;
+}
+
+// 20. Rhythm monotony (check)
+function checkRhythmMonotony(ctx) {
+  if (ctx.lengths.length < 4) return emptyResult();
+  const avg = ctx.lengths.reduce((s, v) => s + v, 0) / ctx.lengths.length;
+  const s = stdDev(ctx.lengths, avg);
+  if (s >= 3.0) return emptyResult();
+  const r = emptyResult();
+  r.highlights = [{ start: 0, end: ctx.text.length, type: 'Одинаковая длина фраз по всему чанку', severity: 'medium' }];
+  r.flags = [{ type: 'Монотонный ритм предложений', severity: 'medium', count: 1,
+    comment: 'Предложения в чанке близки по длине. Это глобальное свойство чанка, поэтому подсвечен весь фрагмент.' }];
+  r.score = 12;
+  r.suggestions = ['Сломайте ритм: объедините пару соседних предложений или оставьте одно очень короткое.'];
+  return r;
+}
+
+// 21. Generic words
+const GENERIC_WORDS = new Set([
+  'странный','странная','странное','странные','странно',
+  'красивый','красивая','красивое','красивые',
+  'приятный','приятная','приятное',
+  'обычный','обычная','обычное','обычные',
+  'ужасный','ужасная','ужасное',
+  'тяжёлый','тяжёлая','тяжёлое','тяжёлые',
+  'тёмный','тёмная','тёмное','тёмные',
+  'страшный','страшная','страшное',
+  'необычный','необычная','необычное',
+  'важный','важная','важное',
+  'хороший','хорошая','хорошее',
+  'плохой','плохая','плохое',
+  'сильный','сильная','сильное'
+]);
+
+function checkGenericWords(ctx) {
+  const wordRe = /[\p{L}\p{N}]+/giu;
+  const found = [];
+  let m;
+  while ((m = wordRe.exec(ctx.text)) !== null) {
+    if (GENERIC_WORDS.has(m[0].toLowerCase())) {
+      found.push({ start: m.index, end: m.index + m[0].length, type: 'Общее оценочное слово', severity: 'low' });
+    }
+  }
+  if (found.length < 5) return emptyResult();
+  const severity = found.length >= 9 ? 'medium' : 'low';
+  const r = emptyResult();
+  r.highlights = found.map(h => ({ ...h, severity }));
+  r.flags = [{ type: 'Общая оценочная лексика', severity, count: found.length,
+    comment: 'Много общих оценочных слов. Часть можно заменить конкретикой.' }];
+  r.score = found.length * 2 + Math.min(18, found.length * 2);
+  r.suggestions = ['Замените часть общих слов на конкретные признаки.'];
+  return r;
+}
+
+// ─── ANALYSIS ENGINE ─────────────────────────────────────────────────────────
+
+function rhythmMonotonyMetric(lengths) {
+  if (lengths.length < 3) return 0;
+  const avg = lengths.reduce((s, v) => s + v, 0) / lengths.length;
+  const s = stdDev(lengths, avg);
+  const coeff = avg === 0 ? 0 : s / avg;
+  let score = 100 - coeff * 180;
+  if (s < 2.0) score += 24;
+  else if (s < 3.0) score += 12;
+  return clamp(score, 0, 100);
+}
+
+function analyzeChunk(index, text) {
+  const { sentences, positions } = parseSentences(text);
+  const lengths = sentences.map(wordCount);
+  const avg = lengths.length ? lengths.reduce((s, v) => s + v, 0) / lengths.length : 0;
+  const s = stdDev(lengths, avg);
+  const ctx = { index, text, sentences, positions, lengths };
+
+  const checkFns = [
+    checkContrast, checkBecause, checkNotJust, checkMoreThan, checkAsIf,
+    checkPseudoAphorism, checkHyperbole, checkSmell, checkPompous, checkTripleEnum,
+    checkEmotionLabel, checkMirrorSentences, checkHookParagraph, checkBoldMark,
+    checkShortPhraseSeries, checkRepeatedStart, checkTwoAdjectives,
+    checkDashOutsideDialogue, checkLexicalPredictability, checkRhythmMonotony, checkGenericWords
+  ];
+
+  let flags = [], highlights = [], suggestions = [];
+  let score = 0, lexicalPredictability = 0;
+
+  for (const fn of checkFns) {
+    const r = fn(ctx);
+    flags.push(...r.flags);
+    highlights.push(...r.highlights);
+    suggestions.push(...r.suggestions);
+    score += r.score;
+    if (r.metrics?.lexicalPredictability) {
+      lexicalPredictability = Math.max(lexicalPredictability, r.metrics.lexicalPredictability);
+    }
+  }
+
+  if (!suggestions.length) suggestions.push('Сильных формальных проблем не найдено.');
+  const finalScore = clamp(score, 0, 100);
+
+  return {
+    index, text,
+    chars: text.length,
+    sentenceCount: sentences.length,
+    avgSentenceLength: rnd(avg),
+    sentenceLengthStd: rnd(s),
+    lexicalPredictability: rnd(lexicalPredictability),
+    rhythmMonotony: rnd(rhythmMonotonyMetric(lengths)),
+    riskScore: rnd(finalScore),
+    label: labelFor(finalScore),
+    flags,
+    highlights: mergeHighlights(highlights),
+    suggestions: [...new Set(suggestions)]
+  };
+}
+
+function buildProblemStats(chunks) {
+  const stats = new Map();
+  for (const chunk of chunks) {
+    const seen = new Set();
+    for (const flag of chunk.flags) {
+      if (!stats.has(flag.type)) stats.set(flag.type, [0, 0]);
+      const s = stats.get(flag.type);
+      s[1] += flag.count;
+      if (!seen.has(flag.type)) { s[0]++; seen.add(flag.type); }
+    }
+  }
+  return [...stats.entries()]
+    .map(([type, [chunkCount, totalCount]]) => ({ type, chunks: chunkCount, totalCount }))
+    .sort((a, b) => b.totalCount - a.totalCount)
+    .slice(0, 12);
+}
+
+function analyzeText(text) {
+  const chunkTexts = splitChunks(text, 1100);
+  const chunks = chunkTexts.map((t, i) => analyzeChunk(i, t));
+  const avgRisk = chunks.reduce((s, c) => s + c.riskScore, 0) / chunks.length;
+  const avgSentLen = chunks.reduce((s, c) => s + c.avgSentenceLength, 0) / chunks.length;
+  const avgSentStd = chunks.reduce((s, c) => s + c.sentenceLengthStd, 0) / chunks.length;
+  const suspicious = chunks.filter(c => c.riskScore >= 35).length;
+  const strong = chunks.filter(c => c.riskScore >= 60).length;
+  const label = avgRisk < 30 ? 'низкая сглаженность' : avgRisk < 60 ? 'умеренная сглаженность' : 'высокая сглаженность';
+  const verdict = avgRisk < 30
+    ? 'Формально текст выглядит достаточно живым. Единичные подсветки стоит проверять только по уместности.'
+    : avgRisk < 60
+      ? 'Есть зоны сглаженности и совпадения с чек-листом паттерна. Это не доказательство ИИ, а список мест для ручной редактуры.'
+      : 'Много формально сглаженных зон. Стоит проверить повторяющиеся приёмы, ритм и шаблонные связки.';
+  return {
+    riskScore: rnd(avgRisk),
+    smoothnessLabel: label,
+    verdict,
+    summary: { totalChunks: chunks.length, suspicious, strong,
+      averageRisk: rnd(avgRisk), avgSentenceLength: rnd(avgSentLen), avgSentenceStd: rnd(avgSentStd),
+      commonProblems: buildProblemStats(chunks) },
+    chunks
+  };
+}
+
+// ─── UI ───────────────────────────────────────────────────────────────────────
+
+const textArea = document.getElementById('textArea');
+const analyzeBtn = document.getElementById('analyzeBtn');
+const clearBtn = document.getElementById('clearBtn');
+const wordCountEl = document.getElementById('wordCountEl');
+const errorBanner = document.getElementById('errorBanner');
+const errorText = document.getElementById('errorText');
+const dismissError = document.getElementById('dismissError');
+const skeletonWrap = document.getElementById('skeletonWrap');
+const resultContainer = document.getElementById('resultContainer');
+const summaryBox = document.getElementById('summaryBox');
+const chunkListItems = document.getElementById('chunkListItems');
+const chunksSection = document.getElementById('chunksSection');
+const fileInput = document.getElementById('fileInput');
+
+function showError(msg) {
+  errorText.textContent = msg;
+  errorBanner.style.display = 'flex';
+}
+
+function hideError() {
+  errorBanner.style.display = 'none';
+}
+
+function updateToolbar() {
+  const text = textArea.value;
+  const chars = text.length;
+  const wc = text.trim().split(/\s+/).filter(Boolean).length;
+  const tooLong = chars > MAX_CHARS;
+  const tooShort = wc < 50;
+  analyzeBtn.disabled = tooShort || tooLong;
+  clearBtn.style.display = text ? 'inline-flex' : 'none';
+  if (tooShort && wc > 0) {
+    wordCountEl.className = 'wordCount';
+    wordCountEl.textContent = `${wc} / 50 слов`;
+  } else if (tooLong) {
+    wordCountEl.className = 'wordCount error';
+    wordCountEl.textContent = `${chars.toLocaleString('ru')} / 200 000 симв.`;
+  } else {
+    wordCountEl.textContent = '';
+  }
+}
+
+function explainScore(chunk) {
+  if (chunk.riskScore === 0) return 'Паттернов не найдено — балл нулевой.';
+  const high = chunk.flags.filter(f => f.severity === 'high');
+  const medium = chunk.flags.filter(f => f.severity === 'medium');
+  const low = chunk.flags.filter(f => f.severity === 'low');
+  const parts = [];
+  if (high.length) parts.push(`сильные паттерны: ${high.map(f => f.type).join(', ')}`);
+  if (medium.length) parts.push(`умеренные паттерны: ${medium.map(f => f.type).join(', ')}`);
+  if (low.length) parts.push(`слабые паттерны: ${low.map(f => f.type).join(', ')}`);
+  if (chunk.rhythmMonotony > 40) parts.push(`монотонный ритм (${chunk.rhythmMonotony}/100)`);
+  if (chunk.lexicalPredictability > 40) parts.push(`предсказуемая лексика (${chunk.lexicalPredictability}/100)`);
+  if (!parts.length) return 'Незначительные отклонения по метрикам.';
+  return `Из чего складывается балл: ${parts.join('; ')}.`;
+}
+
+function renderHighlightedText(chunk) {
+  const highlights = chunk.highlights || [];
+  const text = chunk.text;
+  if (!highlights.length) return escHtml(text);
+  const sorted = [...highlights].filter(h => h.start >= 0 && h.end > h.start).sort((a, b) => a.start - b.start);
+  let html = '', cursor = 0;
+  for (const h of sorted) {
+    if (h.start < cursor) continue;
+    if (h.start > cursor) html += escHtml(text.slice(cursor, h.start));
+    html += `<mark class="highlight ${escHtml(h.severity || 'medium')}" title="${escHtml(h.type)}">${escHtml(text.slice(h.start, h.end))}</mark>`;
+    cursor = h.end;
+  }
+  if (cursor < text.length) html += escHtml(text.slice(cursor));
+  return html;
+}
+
+function renderMeter(label, value, tooltip) {
+  const v = Math.min(100, Math.max(0, Number(value) || 0));
+  return `<div class="meter">
+    <div class="meterTop">
+      <span>${escHtml(label)}${tooltip ? `<abbr class="meterHint" title="${escHtml(tooltip)}">?</abbr>` : ''}</span>
+      <b>${v}/100</b>
+    </div>
+    <div class="meterBar"><div style="width:${v}%"></div></div>
+  </div>`;
+}
+
+function renderChunkDetail(chunk) {
+  const rc = riskClass(chunk.riskScore);
+  const flagsHtml = chunk.flags.length
+    ? `<div class="flags">${chunk.flags.map(f => `
+      <div class="flag ${f.severity || 'medium'}">
+        <div class="flagRow"><b>${escHtml(f.type)}</b><span>${f.count} найдено</span></div>
+        <p>${escHtml(f.comment)}</p>
+      </div>`).join('')}</div>`
+    : `<div class="clean">Сильных формальных флагов нет.</div>`;
+
+  const suggestionsHtml = chunk.suggestions.length
+    ? `<div class="suggestions"><h3>Что можно проверить</h3><ul>${chunk.suggestions.map(s => `<li>${escHtml(s)}</li>`).join('')}</ul></div>`
+    : '';
+
+  return `<article class="chunk">
+    <header class="chunkHeader">
+      <div>
+        <h3>Чанк #${chunk.index + 1}</h3>
+        <p class="meta">${chunk.chars} симв. · ${chunk.sentenceCount} предл. · средняя длина ${chunk.avgSentenceLength} · разброс ${chunk.sentenceLengthStd}</p>
+      </div>
+      <div class="riskBadge ${rc}">
+        <small>индекс чанка</small><br>
+        <b>${chunk.riskScore}/100</b>
+      </div>
+    </header>
+    <p class="chunkExplanation">${escHtml(explainScore(chunk))}</p>
+    <div class="meters">
+      ${renderMeter('Ожидаемость лексики', chunk.lexicalPredictability,
+        'Доля частотных, абстрактных и взаимозаменяемых слов. Чем выше балл — тем более шаблонная лексика.')}
+      ${renderMeter('Монотонность ритма', chunk.rhythmMonotony,
+        'Насколько ровны предложения по длине. Чем выше балл — тем ровнее ритм.')}
+    </div>
+    ${flagsHtml}
+    ${suggestionsHtml}
+    <div class="textBlock">${renderHighlightedText(chunk)}</div>
+  </article>`;
+}
+
+function renderChunkList(chunks) {
+  return chunks.map(c => {
+    const rc = riskClass(c.riskScore);
+    const active = activeChunk === c.index ? ' active' : '';
+    return `<button class="chunkButton ${rc}${active}" data-chunk="${c.index}">
+      <span>#${c.index + 1}</span>
+      <b>индекс ${c.riskScore}/100</b>
+      <small>${escHtml(c.label)}</small>
+    </button>`;
+  }).join('');
+}
+
+function renderSummary(result) {
+  const staleNotice = isStale ? `<p class="staleNotice">Текст изменён — результаты могут быть устаревшими.</p>` : '';
+  const problems = (result.summary?.commonProblems || []).filter(p => p.totalCount > 0);
+  const maxCount = problems[0]?.totalCount || 1;
+  const problemsHtml = problems.length ? `
+    <div class="commonProblems">
+      <p class="commonProblemsTitle">Частые паттерны</p>
+      <ul class="problemList">
+        ${problems.map(p => {
+          const barW = Math.round(p.totalCount / maxCount * 100);
+          const chunkWord = p.chunks % 10 === 1 && p.chunks % 100 !== 11 ? 'е' : 'ах';
+          return `<li class="problemItem">
+            <div class="problemBar" style="width:${barW}%"></div>
+            <span class="problemName">${escHtml(p.type)}</span>
+            <span class="problemMeta"><b>${p.totalCount}×</b><span>в ${p.chunks} чанк${chunkWord}</span></span>
+          </li>`;
+        }).join('')}
+      </ul>
+    </div>` : '';
+  return `${staleNotice}
+    <h2>${escHtml(result.smoothnessLabel)}</h2>
+    <p class="summaryVerdict">${escHtml(result.verdict)}</p>
+    <p class="summaryNote">Индекс отражает сглаженность текста, а не «силу ошибки».</p>
+    ${problemsHtml}`;
+}
+
+function showResults(result) {
+  skeletonWrap.style.display = 'none';
+  resultContainer.style.display = '';
+  summaryBox.className = 'summaryBox' + (isStale ? ' stale' : '');
+  summaryBox.innerHTML = renderSummary(result);
+  chunkListItems.innerHTML = renderChunkList(result.chunks);
+  const shown = activeChunk === null ? result.chunks : result.chunks.filter(c => c.index === activeChunk);
+  chunksSection.innerHTML = shown.map(c => renderChunkDetail(c)).join('');
+}
+
+// ─── EVENTS ───────────────────────────────────────────────────────────────────
+
+textArea.addEventListener('input', () => {
+  updateToolbar();
+  hideError();
+  if (currentResult) {
+    isStale = true;
+    summaryBox.className = 'summaryBox stale';
+    summaryBox.innerHTML = renderSummary(currentResult);
+  }
+});
+
+analyzeBtn.addEventListener('click', () => {
+  const text = textArea.value.trim();
+  if (!text) return;
+  hideError();
+  analyzeBtn.disabled = true;
+  analyzeBtn.textContent = 'Проверяю...';
+  skeletonWrap.style.display = '';
+  resultContainer.style.display = 'none';
+
+  // Run analysis in a setTimeout to allow the UI to update first
+  setTimeout(() => {
+    try {
+      currentResult = analyzeText(text);
+      activeChunk = null;
+      isStale = false;
+      showResults(currentResult);
+    } catch (e) {
+      showError('Ошибка анализа: ' + e.message);
+      skeletonWrap.style.display = 'none';
+    } finally {
+      analyzeBtn.textContent = 'Проверить';
+      updateToolbar();
+    }
+  }, 0);
+});
+
+clearBtn.addEventListener('click', () => {
+  textArea.value = '';
+  currentResult = null;
+  activeChunk = null;
+  isStale = false;
+  hideError();
+  resultContainer.style.display = 'none';
+  skeletonWrap.style.display = 'none';
+  updateToolbar();
+});
+
+dismissError.addEventListener('click', hideError);
+
+fileInput.addEventListener('change', async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  e.target.value = '';
+  if (file.size > 600_000) { showError('Файл слишком большой. Максимум — 200 000 символов.'); return; }
+  const content = await file.text();
+  textArea.value = content;
+  updateToolbar();
+  hideError();
+  if (currentResult) isStale = true;
+});
+
+// Event delegation for chunk buttons
+chunkListItems.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-chunk]');
+  if (!btn || !currentResult) return;
+  const idx = parseInt(btn.dataset.chunk, 10);
+  activeChunk = activeChunk === idx ? null : idx;
+  chunkListItems.innerHTML = renderChunkList(currentResult.chunks);
+  const shown = activeChunk === null ? currentResult.chunks : currentResult.chunks.filter(c => c.index === activeChunk);
+  chunksSection.innerHTML = shown.map(c => renderChunkDetail(c)).join('');
+});
+
+updateToolbar();
+</script>
+</body>
+</html>
